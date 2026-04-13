@@ -1,0 +1,9 @@
+ @import "tailwindcss";
+ body {
+  @apply bg-slate-100 text-slate-800;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.container-app {
+  @apply max-w-6xl mx-auto px-4;
+}

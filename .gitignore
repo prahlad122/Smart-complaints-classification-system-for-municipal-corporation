@@ -1,0 +1,104 @@
+# =========================
+# Node modules
+# =========================
+node_modules/
+municipal-frontend/node_modules/
+municipal-backend/node_modules/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+municipal-frontend/.env
+municipal-backend/.env
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Build folders
+# =========================
+build/
+dist/
+municipal-frontend/build/
+municipal-backend/build/
+
+# =========================
+# Dependency directories
+# =========================
+.pnp/
+.pnp.js
+
+# =========================
+# Testing
+# =========================
+coverage/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor files
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Cache files
+# =========================
+.cache/
+.parcel-cache/
+
+# =========================
+# Next.js / React specific
+# =========================
+.next/
+out/
+
+# =========================
+# Misc
+# =========================
+*.pem
+*.pid
+*.seed
+
+# =========================
+# Optional: Database files
+# =========================
+*.sqlite
+*.sqlite3
+
+# =========================
+# Optional: Uploads (if storing locally)
+# =========================
+uploads/
+public/uploads/
+
+# =========================
+# TypeScript
+# =========================
+*.tsbuildinfo
+
+# =========================
+# ESLint cache
+# =========================
+.eslintcache
+#=========================#
+
+municipal-backend/uploads/
