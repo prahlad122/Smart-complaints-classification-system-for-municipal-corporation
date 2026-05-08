@@ -26,7 +26,7 @@ const complaintSchema = new mongoose.Schema(
       trim: true,
     },
 
-    // 📍 Coordinates for Map View
+    //  Coordinates for Map View
     lat: {
       type: Number,
     },
@@ -46,29 +46,43 @@ const complaintSchema = new mongoose.Schema(
         "Road Maintenance",
         "Electricity",
         "Water Supply",
+        "Parks & Recreation",
         "Other",
         "Uncategorized",
       ],
       default: "Uncategorized",
     },
 
-    // 🏢 Assigned Department
+    //  Assigned Department
     department: {
       type: String,
       default: "Unassigned",
     },
 
-    // 📊 Complaint Status
+    //  Complaint Status
     status: {
       type: String,
       enum: ["Pending", "In Progress", "Resolved"],
       default: "Pending",
     },
+
     //  Complaint Priority
     priority: {
       type: String,
-      enum: ["Low", "Medium", "High"],
+      enum: ["Low", "Medium", "High", "Critical"],
       default: "Low",
+    },
+
+    //  AI Classification Metadata
+    aiConfidence: {
+      type: Number,
+      min: 0,
+      max: 1,
+    },
+
+    aiSummary: {
+      type: String,
+      trim: true,
     },
 
     history: [

@@ -88,7 +88,14 @@ function Layout() {
                 </AdminRoute>
               }
             />
-            <Route path="/admin/map" element={<ComplaintMap />} />
+            <Route
+              path="/admin/map"
+              element={
+                <AdminRoute>
+                  <ComplaintMap />
+                </AdminRoute>
+              }
+            />
           </Routes>
         </main>
       </div>

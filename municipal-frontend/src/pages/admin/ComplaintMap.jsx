@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, CircleMarker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { getAllComplaints } from "../../services/complaintService";
 import "leaflet.heat";
 import L from "leaflet";
 
-/* ---------------- HEATMAP LAYER COMPONENT ---------------- */  
+// Fix default Leaflet marker icon
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+});
 
+/* ---------- HEATMAP LAYER ---------- */
 function HeatmapLayer({ complaints }) {
   const map = useMap();
 
@@ -16,6 +26,8 @@ function HeatmapLayer({ complaints }) {
     const heatPoints = complaints
       .filter((c) => c.lat && c.lng)
       .map((c) => [c.lat, c.lng, 0.5]);
+
+    if (heatPoints.length === 0) return;
 
     const heatLayer = L.heatLayer(heatPoints, {
       radius: 25,
@@ -33,10 +45,18 @@ function HeatmapLayer({ complaints }) {
   return null;
 }
 
-/* ---------------- MAIN COMPONENT ---------------- */
+/* ---------- STATUS COLORS ---------- */
+const STATUS_COLORS = {
+  Pending: "#f59e0b",
+  "In Progress": "#3b82f6",
+  Resolved: "#10b981",
+};
 
+/* ---------- MAIN COMPONENT ---------- */
 export default function ComplaintMap() {
   const [complaints, setComplaints] = useState([]);
+  const [viewMode, setViewMode] = useState("markers"); // "markers" | "heatmap"
+  const [statusFilter, setStatusFilter] = useState("All");
 
   useEffect(() => {
     fetchComplaints();
@@ -51,38 +71,126 @@ export default function ComplaintMap() {
     }
   };
 
-  return (
-    <div className="container-app py-8">
-      <h1 className="text-3xl font-bold mb-6">Complaint Map</h1>
+  const mappable = complaints.filter((c) => c.lat && c.lng);
+  const filtered =
+    statusFilter === "All"
+      ? mappable
+      : mappable.filter((c) => c.status === statusFilter);
 
-      <div className="h-[500px] rounded-xl overflow-hidden">
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Complaint Map</h1>
+          <p className="text-sm text-slate-500">
+            {filtered.length} of {complaints.length} complaints mapped
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex bg-slate-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("markers")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                viewMode === "markers"
+                  ? "bg-[#1e3a5f] text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white"
+              }`}
+            >
+              Markers
+            </button>
+            <button
+              onClick={() => setViewMode("heatmap")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
+                viewMode === "heatmap"
+                  ? "bg-[#1e3a5f] text-white shadow-sm"
+                  : "text-slate-600 hover:bg-white"
+              }`}
+            >
+               Heatmap
+            </button>
+          </div>
+
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
+          >
+            <option value="All">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-lg px-4 py-2">
+        <span className="text-xs text-slate-500 font-medium">Legend:</span>
+        {Object.entries(STATUS_COLORS).map(([status, color]) => (
+          <div key={status} className="flex items-center gap-1.5">
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: color }}
+            ></div>
+            <span className="text-xs text-slate-600">{status}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Map */}
+      <div className="h-[550px] rounded-xl overflow-hidden border border-slate-200 shadow-sm">
         <MapContainer
-          center={[28.6139, 77.209]}
+          center={[26.8467, 80.9462]}
           zoom={12}
           className="h-full w-full"
         >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          />
 
-          {/* Heatmap Layer */}
-          <HeatmapLayer complaints={complaints} />
+          {/* Heatmap Mode */}
+          {viewMode === "heatmap" && <HeatmapLayer complaints={filtered} />}
 
-          {/* Markers */}
-
-          {complaints.map((c) => {
-            if (!c.lat || !c.lng) return null;
-
-            return (
-              <Marker key={c._id} position={[c.lat, c.lng]}>
+          {/* Marker Mode */}
+          {viewMode === "markers" &&
+            filtered.map((c) => (
+              <CircleMarker
+                key={c._id}
+                center={[c.lat, c.lng]}
+                radius={8}
+                pathOptions={{
+                  fillColor: STATUS_COLORS[c.status] || "#64748b",
+                  color: "#fff",
+                  weight: 2,
+                  fillOpacity: 0.9,
+                }}
+              >
                 <Popup>
-                  <strong>{c.title}</strong>
-                  <br />
-                  {c.location}
-                  <br />
-                  Status: {c.status}
+                  <div className="min-w-[180px]">
+                    <p className="font-semibold text-sm mb-1">{c.title}</p>
+                    <p className="text-xs text-slate-500 mb-1">📍 {c.location}</p>
+                    <div className="flex gap-2 mt-2">
+                      <span
+                        className="text-[10px] px-1.5 py-0.5 rounded font-medium"
+                        style={{
+                          backgroundColor: STATUS_COLORS[c.status] + "22",
+                          color: STATUS_COLORS[c.status],
+                        }}
+                      >
+                        {c.status}
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 font-medium">
+                        {c.category}
+                      </span>
+                    </div>
+                  </div>
                 </Popup>
-              </Marker>
-            );
-          })}
+              </CircleMarker>
+            ))}
         </MapContainer>
       </div>
     </div>

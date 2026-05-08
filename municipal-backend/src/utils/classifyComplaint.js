@@ -48,12 +48,38 @@ export const classifyComplaint = (text) => {
     return "Water Supply";
   }
 
+  // Parks & Recreation
+  if (
+    t.includes("park") ||
+    t.includes("garden") ||
+    t.includes("playground") ||
+    t.includes("tree") ||
+    t.includes("bench") ||
+    t.includes("grass") ||
+    t.includes("field")
+  ) {
+    return "Parks & Recreation";
+  }
+
   return "Other";
 };
 
 export const detectPriority = (text) => {
   const t = text.toLowerCase();
 
+  // Critical — emergencies
+  if (
+    t.includes("flood") ||
+    t.includes("collapse") ||
+    t.includes("gas leak") ||
+    t.includes("explosion") ||
+    t.includes("electrocution") ||
+    t.includes("emergency")
+  ) {
+    return "Critical";
+  }
+
+  // High — dangerous situations
   if (
     t.includes("electric shock") ||
     t.includes("fire") ||
@@ -63,6 +89,7 @@ export const detectPriority = (text) => {
     return "High";
   }
 
+  // Medium — service disruptions
   if (
     t.includes("garbage") ||
     t.includes("water leak") ||
@@ -75,9 +102,28 @@ export const detectPriority = (text) => {
 };
 
 export const departmentMap = {
-  "Sanitation": "Waste Management Department",
+  Sanitation: "Waste Management Department",
   "Road Maintenance": "Public Works Department",
-  "Electricity": "Electricity Board",
+  Electricity: "Electricity Board",
   "Water Supply": "Water Department",
-  "Other": "General Department"
+  "Parks & Recreation": "Parks Department",
+  Other: "General Department",
+};
+
+/**
+ * Fallback classification using keyword rules.
+ * Returns the same shape as AI classification for consistency.
+ */
+export const getFallbackResult = (title, description) => {
+  const text = `${title} ${description}`.toLowerCase().trim();
+
+  const category = classifyComplaint(text);
+  const priority = detectPriority(text);
+
+  return {
+    category,
+    priority,
+    confidence: 0.6,
+    summary: "Rule-based classification",
+  };
 };

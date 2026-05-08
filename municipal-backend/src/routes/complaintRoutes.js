@@ -8,6 +8,7 @@ import {
   getMyComplaints,
   deleteComplaint,
   getComplaintStats,
+  getComplaintStatsByCategory,
   getAllComplaints,
   updateComplaint,
 } from "../controllers/complaintController.js";
@@ -30,6 +31,9 @@ router.delete("/:id", protect, deleteComplaint);
 
 // Get dashboard stats
 router.get("/stats", protect, admin, getComplaintStats);
+
+// Get detailed stats (aggregation)
+router.get("/stats/detailed", protect, admin, getComplaintStatsByCategory);
 
 // Get all complaints
 router.get("/admin", protect, admin, getAllComplaints);

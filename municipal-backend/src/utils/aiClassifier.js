@@ -1,61 +1,102 @@
-import OpenAI from "openai";
+import openai from "../services/aiClient.js";
+import { OPENAI_MODEL } from "../config/env.js";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const VALID_CATEGORIES = [
+  "Sanitation",
+  "Road Maintenance",
+  "Electricity",
+  "Water Supply",
+  "Parks & Recreation",
+  "Other",
+];
 
-export const classifyWithAI = async (text) => {
+const VALID_PRIORITIES = ["Low", "Medium", "High", "Critical"];
+
+/**
+ * Classify a complaint using OpenAI.
+ * Returns { category, priority, confidence, summary } or null on failure.
+ */
+export const classifyWithAI = async (title, description) => {
+  if (!openai) return null;
+
   try {
+    const systemPrompt = `You are a municipal complaint classifier. You MUST respond with ONLY valid JSON — no markdown fences, no explanation, no extra text.
 
-    const prompt = `
-Classify this municipal complaint.
+Return exactly this JSON schema:
+{"category": "", "priority": "", "confidence": 0.0, "summary": ""}
 
-Categories:
-Sanitation
-Road Maintenance
-Electricity
-Water Supply
-Other
+Valid categories: ${VALID_CATEGORIES.join(", ")}
+Valid priorities: ${VALID_PRIORITIES.join(", ")}
 
-Priority:
-Low
-Medium
-High
+Rules:
+- confidence is a number between 0 and 1 indicating how certain you are
+- summary is a single sentence describing the core issue
+- Choose the most specific category that applies
+- Assign "Critical" priority only for emergencies: floods, collapses, gas leaks, explosions, electrocution, fires
+- Assign "High" for dangerous situations, "Medium" for service disruptions, "Low" for minor inconveniences`;
 
-Return JSON only:
+    const userPrompt = `Classify this municipal complaint:
 
-{
- "category": "",
- "priority": ""
-}
+Title: ${title}
+Description: ${description}`;
 
-Complaint:
-${text}
-`;
+    console.log(" Sending to AI:", title);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: OPENAI_MODEL,
       messages: [
-        { role: "system", content: "You classify municipal complaints." },
-        { role: "user", content: prompt },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0,
     });
 
     let result = response.choices[0].message.content;
 
-    result = result
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
+    console.log(" Raw AI response:", result);
 
-    return JSON.parse(result);
+    // Strip markdown fences if present
+    result = result.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
 
+    let parsed;
+    try {
+      parsed = JSON.parse(result);
+    } catch {
+      console.error(" AI JSON parse failed");
+      return null;
+    }
+
+    // Validate category
+    if (!VALID_CATEGORIES.includes(parsed.category)) {
+      console.error(" AI returned invalid category:", parsed.category);
+      return null;
+    }
+
+    // Validate priority
+    if (!VALID_PRIORITIES.includes(parsed.priority)) {
+      console.error(" AI returned invalid priority:", parsed.priority);
+      return null;
+    }
+
+    // Normalize confidence
+    const confidence = typeof parsed.confidence === "number"
+      ? Math.min(1, Math.max(0, parsed.confidence))
+      : 0.8;
+
+    const summary = typeof parsed.summary === "string"
+      ? parsed.summary
+      : "AI-classified complaint";
+
+    console.log("AI classification:", parsed.category, parsed.priority, confidence);
+
+    return {
+      category: parsed.category,
+      priority: parsed.priority,
+      confidence,
+      summary,
+    };
   } catch (error) {
-
-    console.log("AI unavailable → using fallback classifier");
-
-    return null; // important for fallback
-
+    console.error(" AI classification error:", error.message);
+    return null;
   }
 };
