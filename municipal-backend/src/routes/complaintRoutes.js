@@ -1,6 +1,6 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
-import { upload } from "../middleware/uploadMiddleware.js";
+import upload from "../middleware/upload.js";
 import { admin } from "../middleware/adminMiddleware.js";
 
 import {
@@ -26,7 +26,6 @@ router.get("/my", protect, getMyComplaints);
 // Delete complaint
 router.delete("/:id", protect, deleteComplaint);
 
-
 /* ---------- ADMIN ROUTES ---------- */
 
 // Get dashboard stats
@@ -40,6 +39,5 @@ router.get("/admin", protect, admin, getAllComplaints);
 
 // Update complaint (status / department)
 router.put("/:id", protect, admin, updateComplaint);
-
 
 export default router;

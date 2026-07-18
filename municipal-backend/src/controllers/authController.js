@@ -25,7 +25,7 @@ export const login = async (req, res) => {
 
   // Find user
   const user = await User.findOne({ email: emailLower });
-  // console.log("User found:", user);
+  
 
   if (!user) {
     return res.status(400).json({ message: "Invalid credentials" });
@@ -33,7 +33,6 @@ export const login = async (req, res) => {
 
   // Compare hashed password
   const match = await bcrypt.compare(password, user.password);
-  // console.log("Password match:", match);
 
   if (!match) {
     return res.status(400).json({ message: "Invalid credentials" });

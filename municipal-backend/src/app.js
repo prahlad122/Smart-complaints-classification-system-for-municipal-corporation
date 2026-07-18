@@ -10,11 +10,11 @@ const app = express();
 
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin:  process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+ 
 
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);

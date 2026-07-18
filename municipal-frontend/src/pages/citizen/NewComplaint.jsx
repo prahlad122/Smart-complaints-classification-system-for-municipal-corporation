@@ -16,6 +16,7 @@ import {
 
 export default function NewComplaint() {
   const [form, setForm] = useState({
+    name: "",
     title: "",
     description: "",
     location: "",
@@ -48,7 +49,9 @@ export default function NewComplaint() {
       alert("Geolocation not supported");
       return;
     }
+
     setGettingLocation(true);
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setLat(position.coords.latitude);
@@ -73,12 +76,17 @@ export default function NewComplaint() {
 
     try {
       setLoading(true);
+
       const formData = new FormData();
+
+      formData.append("name", form.name);
       formData.append("title", form.title);
       formData.append("description", form.description);
       formData.append("location", form.location);
+
       if (lat) formData.append("lat", lat);
       if (lng) formData.append("lng", lng);
+
       if (image) formData.append("image", image);
 
       const res = await createComplaint(formData);
@@ -94,7 +102,13 @@ export default function NewComplaint() {
   };
 
   const handleReset = () => {
-    setForm({ title: "", description: "", location: "" });
+    setForm({
+      name: "",
+      title: "",
+      description: "",
+      location: "",
+    });
+
     setImage(null);
     setPreview(null);
     setLat(null);
@@ -111,26 +125,36 @@ export default function NewComplaint() {
 
   const priorityColor = (p) => {
     switch (p) {
-      case "Critical": return "bg-red-600 text-white";
-      case "High": return "bg-red-100 text-red-700";
-      case "Medium": return "bg-amber-100 text-amber-700";
-      default: return "bg-slate-100 text-slate-600";
+      case "Critical":
+        return "bg-red-600 text-white";
+
+      case "High":
+        return "bg-red-100 text-red-700";
+
+      case "Medium":
+        return "bg-amber-100 text-amber-700";
+
+      default:
+        return "bg-slate-100 text-slate-600";
     }
   };
 
   /* ---------- SUCCESS SCREEN ---------- */
+
   if (submitted && result) {
     return (
-      <div className="py-10 px-4 flex justify-center">
-        <div className="w-full max-w-lg">
+      <div className="py-6 sm:py-8 lg:py-10 px-3 sm:px-4 lg:px-6 flex justify-center">
+        <div className="w-full max-w-lg md:max-w-xl lg:max-w-2xl">
           {/* Success Banner */}
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 mb-6 text-center">
             <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Send size={24} className="text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold text-emerald-800 mb-1">
-              Complaint Submitted! 
+
+            <h2 className="text-xl sm:text-2xl font-bold text-emerald-800 mb-1">
+              Complaint Submitted!
             </h2>
+
             <p className="text-sm text-emerald-600">
               Your complaint has been classified and routed automatically.
             </p>
@@ -143,35 +167,49 @@ export default function NewComplaint() {
               AI Classification Result
             </h3>
 
-            <div className="space-y-3">
+            <div className="grid gap-3">
+              {/* User Name */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-slate-50 rounded-lg">
+                <div className="text-sm text-slate-600">Submitted By</div>
+
+                <span className="text-sm font-semibold text-slate-700">
+                  {result.name}
+                </span>
+              </div>
+
               {/* Category */}
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Tag size={16} />
                   Category
                 </div>
+
                 <span className="text-sm font-semibold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   {result.category}
                 </span>
               </div>
 
               {/* Priority */}
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Shield size={16} />
                   Priority
                 </div>
-                <span className={`text-sm font-semibold px-3 py-1 rounded-full ${priorityColor(result.priority)}`}>
+
+                <span
+                  className={`text-sm font-semibold px-3 py-1 rounded-full ${priorityColor(result.priority)}`}
+                >
                   {result.priority}
                 </span>
               </div>
 
               {/* Department */}
-              <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-slate-600">
                   <Building2 size={16} />
                   Assigned Department
                 </div>
+
                 <span className="text-sm font-semibold text-slate-700">
                   {result.department}
                 </span>
@@ -180,19 +218,25 @@ export default function NewComplaint() {
               {/* Confidence */}
               {result.aiConfidence != null && (
                 <div className="p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 text-sm text-slate-600">
                       <Gauge size={16} />
                       AI Confidence
                     </div>
-                    <span className={`text-sm font-semibold px-2 py-0.5 rounded ${confidenceColor(result.aiConfidence)}`}>
+
+                    <span
+                      className={`text-sm font-semibold px-2 py-0.5 rounded ${confidenceColor(result.aiConfidence)}`}
+                    >
                       {(result.aiConfidence * 100).toFixed(0)}%
                     </span>
                   </div>
+
                   <div className="w-full bg-slate-200 rounded-full h-2">
                     <div
                       className="h-2 rounded-full bg-blue-500 transition-all duration-500"
-                      style={{ width: `${(result.aiConfidence * 100)}%` }}
+                      style={{
+                        width: `${result.aiConfidence * 100}%`,
+                      }}
                     ></div>
                   </div>
                 </div>
@@ -201,8 +245,11 @@ export default function NewComplaint() {
               {/* AI Summary */}
               {result.aiSummary && (
                 <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-blue-500 font-medium mb-1">AI Summary</p>
-                  <p className="text-sm text-blue-800">{result.aiSummary}</p>
+                  <p className="text-xs text-blue-500 font-medium mb-1">
+                    AI Summary
+                  </p>
+
+                  <p className="text-sm sm:text-base leading-6 text-blue-800">{result.aiSummary}</p>
                 </div>
               )}
             </div>
@@ -211,7 +258,7 @@ export default function NewComplaint() {
           {/* Action Button */}
           <button
             onClick={handleReset}
-            className="mt-6 w-full flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#2d5a8e] text-white py-3 rounded-lg font-medium text-sm transition"
+            className="mt-6 w-full flex items-center justify-center gap-2 py-3.5 text-sm sm:text-base bg-[#1e3a5f] hover:bg-[#2d5a8e] text-white rounded-lg font-medium transition"
           >
             <RotateCcw size={16} />
             Submit Another Complaint
@@ -222,27 +269,46 @@ export default function NewComplaint() {
   }
 
   /* ---------- FORM SCREEN ---------- */
+
   return (
-    <div className="py-10 px-4 flex justify-center">
-      <div className="w-full max-w-md">
+    <div className="py-6 sm:py-8 lg:py-10 px-3 sm:px-4 lg:px-6 flex justify-center">
+      <div className="w-full max-w-md lg:max-w-xl">
         <Card>
-          <h2 className="text-2xl font-bold mb-6 text-center text-slate-800">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6 text-center text-slate-800">
             Submit New Complaint
           </h2>
 
           <form onSubmit={handleSubmit}>
+            {/* User Name */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Your Name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition"
+                placeholder="Enter your name"
+              />
+            </div>
+
             {/* Title */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Complaint Title
               </label>
+
               <input
                 type="text"
                 name="title"
                 value={form.title}
                 onChange={handleChange}
                 required
-                className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition"
+                className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition"
                 placeholder="e.g. Garbage not collected"
               />
             </div>
@@ -252,13 +318,14 @@ export default function NewComplaint() {
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Description
               </label>
+
               <textarea
                 name="description"
                 value={form.description}
                 onChange={handleChange}
                 required
-                rows={3}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition resize-none"
+                rows={4}
+                className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition resize-none"
                 placeholder="Explain the issue in detail..."
               />
             </div>
@@ -268,13 +335,14 @@ export default function NewComplaint() {
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Location
               </label>
+
               <input
                 type="text"
                 name="location"
                 value={form.location}
                 onChange={handleChange}
                 required
-                className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition"
+                className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] transition"
                 placeholder="Area / Landmark"
               />
             </div>
@@ -284,13 +352,17 @@ export default function NewComplaint() {
               <button
                 type="button"
                 onClick={getLocation}
-                className="w-full flex items-center justify-center gap-2 bg-slate-100 border border-slate-300 rounded-lg py-2.5 text-sm hover:bg-slate-200 transition"
+                className="w-full flex flex-wrap items-center justify-center gap-2 bg-slate-100 border border-slate-300 rounded-lg py-3 text-sm sm:text-base hover:bg-slate-200 transition"
               >
                 <MapPin size={16} />
-                {gettingLocation ? "Getting GPS Location..." : " Use My Location"}
+
+                {gettingLocation
+                  ? "Getting GPS Location..."
+                  : "Use My Location"}
               </button>
+
               {lat && lng && (
-                <p className="text-xs text-emerald-600 mt-1 text-center font-medium">
+                <p className="text-xs sm:text-sm text-emerald-600 mt-2 text-center font-medium break-all">
                   ✓ Location captured ({lat.toFixed(4)}, {lng.toFixed(4)})
                 </p>
               )}
@@ -301,7 +373,10 @@ export default function NewComplaint() {
               <p className="text-sm font-medium mb-2 text-slate-700">
                 Or select location on map
               </p>
-              <LocationPicker setCoordinates={handleMapLocation} />
+
+              <div className="overflow-hidden rounded-xl border border-slate-200">
+                <LocationPicker setCoordinates={handleMapLocation} />
+              </div>
             </div>
 
             {/* Image Upload */}
@@ -309,12 +384,18 @@ export default function NewComplaint() {
               <label className="block mb-2 text-sm font-medium text-slate-700">
                 Upload Image (optional)
               </label>
-              <label className="flex items-center justify-center w-full cursor-pointer border-2 border-dashed border-slate-300 rounded-xl py-6 text-slate-500 hover:border-blue-500 hover:text-blue-600 transition">
+
+              <label className="flex items-center justify-center w-full cursor-pointer border-2 border-dashed border-slate-300 rounded-xl py-5 sm:py-6 px-4 text-slate-500 hover:border-blue-500 hover:text-blue-600 transition">
                 <div className="text-center space-y-1">
                   <Upload size={24} className="mx-auto mb-1" />
-                  <p className="text-sm font-medium">Click to upload image</p>
+
+                  <p className="text-sm sm:text-base font-medium">
+                    Click to upload image
+                  </p>
+
                   <p className="text-xs">PNG, JPG up to 5MB</p>
                 </div>
+
                 <input
                   type="file"
                   accept="image/*"
@@ -322,8 +403,11 @@ export default function NewComplaint() {
                   className="hidden"
                 />
               </label>
+
               {image && (
-                <p className="text-xs text-slate-500 mt-2">Selected: {image.name}</p>
+                <p className="text-xs text-slate-500 mt-2 break-all">
+                  Selected: {image.name}
+                </p>
               )}
             </div>
 
@@ -333,7 +417,7 @@ export default function NewComplaint() {
                 <img
                   src={preview}
                   alt="Preview"
-                  className="w-40 h-40 object-cover rounded-lg border border-slate-200 shadow"
+                  className="w-full max-w-xs sm:max-w-sm h-48 sm:h-56 object-cover rounded-lg border border-slate-200 shadow"
                 />
               </div>
             )}
@@ -342,7 +426,7 @@ export default function NewComplaint() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#2d5a8e] text-white py-3 rounded-lg font-medium text-sm transition disabled:opacity-60"
+              className="w-full flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#2d5a8e] text-white py-3.5 rounded-lg font-medium text-sm sm:text-base transition disabled:opacity-60"
             >
               {loading ? (
                 <span className="flex items-center gap-2">

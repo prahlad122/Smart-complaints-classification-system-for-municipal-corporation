@@ -39,8 +39,7 @@ Rules:
 
 Title: ${title}
 Description: ${description}`;
-
-    console.log(" Sending to AI:", title);
+ 
 
     const response = await openai.chat.completions.create({
       model: OPENAI_MODEL,
@@ -53,7 +52,7 @@ Description: ${description}`;
 
     let result = response.choices[0].message.content;
 
-    console.log(" Raw AI response:", result);
+    
 
     // Strip markdown fences if present
     result = result.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
@@ -86,8 +85,7 @@ Description: ${description}`;
     const summary = typeof parsed.summary === "string"
       ? parsed.summary
       : "AI-classified complaint";
-
-    console.log("AI classification:", parsed.category, parsed.priority, confidence);
+ 
 
     return {
       category: parsed.category,

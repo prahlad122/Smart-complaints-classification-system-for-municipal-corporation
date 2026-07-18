@@ -31,7 +31,7 @@ export default function MyComplaints() {
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this complaint?"
+      "Are you sure you want to delete this complaint?",
     );
     if (!confirmDelete) return;
 
@@ -68,8 +68,7 @@ export default function MyComplaints() {
   };
 
   const filteredComplaints = complaints.filter((c) => {
-    const matchStatus =
-      statusFilter === "All" || c.status === statusFilter;
+    const matchStatus = statusFilter === "All" || c.status === statusFilter;
     const matchSearch = `${c.title} ${c.location} ${c.description}`
       .toLowerCase()
       .includes(search.toLowerCase());
@@ -78,7 +77,7 @@ export default function MyComplaints() {
 
   if (loading) {
     return (
-      <div className="py-10 text-center text-slate-400">
+      <div className="flex flex-col items-center justify-center py-16 text-slate-400">
         <div className="w-8 h-8 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
         Loading complaints...
       </div>
@@ -87,17 +86,22 @@ export default function MyComplaints() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold text-slate-800">My Complaints</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+          My Complaints
+        </h2>
         <span className="text-sm text-slate-500">
           {filteredComplaints.length} of {complaints.length} complaints
         </span>
       </div>
 
       {/* Search + Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+      <div className="flex flex-col lg:flex-row gap-3">
+        <div className="relative w-full lg:flex-1">
+          <Search
+            size={16}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          />
           <input
             type="text"
             placeholder="Search complaints..."
@@ -107,7 +111,7 @@ export default function MyComplaints() {
           />
         </div>
 
-        <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+        <div className="flex overflow-x-auto whitespace-nowrap gap-1 bg-slate-100 rounded-lg p-1 scrollbar-hide">
           {STATUS_OPTIONS.map((status) => (
             <button
               key={status}
@@ -126,7 +130,7 @@ export default function MyComplaints() {
 
       {/* Complaint Cards */}
       {filteredComplaints.length === 0 ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-12 text-center">
           <FolderOpen size={44} className="text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 mb-1">No complaints found</p>
           <p className="text-xs text-slate-400">
@@ -136,7 +140,7 @@ export default function MyComplaints() {
           </p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredComplaints.map((complaint) => (
             <div
               key={complaint._id}
@@ -145,15 +149,20 @@ export default function MyComplaints() {
               {/* Image */}
               {complaint.image && (
                 <img
-                  src={`http://localhost:5000/${complaint.image}`}
-                  alt="complaint"
-                  className="w-full h-36 object-cover"
+                  src={complaint.image}
+                  alt={complaint.title}
+                  className="w-full h-44 sm:h-40 object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    console.error("Image failed to load:", complaint.image);
+                    e.target.style.display = "none";
+                  }}
                 />
               )}
 
-              <div className="p-5">
+              <div className="p-4 sm:p-5">
                 {/* Title */}
-                <h3 className="font-semibold text-slate-800 mb-2 line-clamp-1">
+                <h3 className="text-base font-semibold text-slate-800 mb-2 line-clamp-2">
                   {complaint.title}
                 </h3>
 
@@ -170,20 +179,22 @@ export default function MyComplaints() {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+                <p className="text-sm leading-6 text-slate-600 mb-3 line-clamp-3">
                   {complaint.description}
                 </p>
 
                 {/* Location */}
                 <p className="text-xs text-slate-500 mb-2">
-                   {complaint.location}
+                  {complaint.location}
                 </p>
 
                 {/* AI Confidence Bar */}
                 {complaint.aiConfidence != null && (
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-slate-400">AI Confidence</span>
+                      <span className="text-[10px] text-slate-400">
+                        AI Confidence
+                      </span>
                       <span className="text-[10px] font-semibold text-slate-500">
                         {(complaint.aiConfidence * 100).toFixed(0)}%
                       </span>
@@ -198,14 +209,14 @@ export default function MyComplaints() {
                 )}
 
                 {/* Footer */}
-                <div className="flex justify-between items-center pt-3 border-t border-slate-100">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-slate-100">
                   <span
                     className={`text-[11px] px-2.5 py-1 rounded-full font-medium ${statusStyle(complaint.status)}`}
                   >
                     {complaint.status || "Pending"}
                   </span>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                     <span className="text-[10px] text-slate-400 flex items-center gap-1">
                       <Clock size={10} />
                       {new Date(complaint.createdAt).toLocaleDateString()}
@@ -213,7 +224,7 @@ export default function MyComplaints() {
 
                     <button
                       onClick={() => handleDelete(complaint._id)}
-                      className="p-1.5 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition opacity-0 group-hover:opacity-100"
+                      className="p-2 rounded-md text-slate-400 hover:text-red-600 hover:bg-red-50 transition opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                       title="Delete"
                     >
                       <Trash2 size={14} />

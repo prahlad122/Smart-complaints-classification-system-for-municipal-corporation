@@ -36,7 +36,10 @@ export default function AdminDashboard() {
   });
   const [complaints, setComplaints] = useState([]);
   const [showBroadcast, setShowBroadcast] = useState(false);
-  const [broadcastForm, setBroadcastForm] = useState({ title: "", message: "" });
+  const [broadcastForm, setBroadcastForm] = useState({
+    title: "",
+    message: "",
+  });
   const [broadcastLoading, setBroadcastLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState("");
 
@@ -152,7 +155,9 @@ export default function AdminDashboard() {
             </div>
             <span className="text-sm text-slate-500">Resolved</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-600">{stats.resolved}</p>
+          <p className="text-2xl font-bold text-emerald-600">
+            {stats.resolved}
+          </p>
         </div>
       </div>
 
@@ -171,7 +176,9 @@ export default function AdminDashboard() {
                 nameKey="name"
                 outerRadius={100}
                 label={({ name, percent }) =>
-                  percent > 0.01 ? `${name} ${(percent * 100).toFixed(0)}%` : null
+                  percent > 0.01
+                    ? `${name} ${(percent * 100).toFixed(0)}%`
+                    : null
                 }
               >
                 {statusData.map((_, i) => (
@@ -199,9 +206,14 @@ export default function AdminDashboard() {
                   <Cell
                     key={i}
                     fill={
-                      ["#3b82f6", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#64748b"][
-                        i % 6
-                      ]
+                      [
+                        "#3b82f6",
+                        "#f59e0b",
+                        "#10b981",
+                        "#ef4444",
+                        "#8b5cf6",
+                        "#64748b",
+                      ][i % 6]
                     }
                   />
                 ))}
@@ -231,7 +243,10 @@ export default function AdminDashboard() {
           </thead>
           <tbody>
             {recentComplaints.map((c) => (
-              <tr key={c._id} className="border-b border-slate-50 hover:bg-slate-50/50">
+              <tr
+                key={c._id}
+                className="border-b border-slate-50 hover:bg-slate-50/50"
+              >
                 <td className="px-6 py-3 font-medium text-slate-700">
                   {c.title}
                 </td>
@@ -272,7 +287,10 @@ export default function AdminDashboard() {
             ))}
             {recentComplaints.length === 0 && (
               <tr>
-                <td colSpan="6" className="px-6 py-8 text-center text-slate-400">
+                <td
+                  colSpan="6"
+                  className="px-6 py-8 text-center text-slate-400"
+                >
                   No complaints yet
                 </td>
               </tr>
@@ -303,7 +321,10 @@ export default function AdminDashboard() {
 
             {broadcastResult ? (
               <div className="text-center py-4">
-                <CheckCircle2 size={40} className="text-emerald-500 mx-auto mb-2" />
+                <CheckCircle2
+                  size={40}
+                  className="text-emerald-500 mx-auto mb-2"
+                />
                 <p className="text-sm text-emerald-700">{broadcastResult}</p>
               </div>
             ) : (
@@ -316,7 +337,10 @@ export default function AdminDashboard() {
                     type="text"
                     value={broadcastForm.title}
                     onChange={(e) =>
-                      setBroadcastForm({ ...broadcastForm, title: e.target.value })
+                      setBroadcastForm({
+                        ...broadcastForm,
+                        title: e.target.value,
+                      })
                     }
                     className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
                     placeholder="Notification title"
@@ -329,7 +353,10 @@ export default function AdminDashboard() {
                   <textarea
                     value={broadcastForm.message}
                     onChange={(e) =>
-                      setBroadcastForm({ ...broadcastForm, message: e.target.value })
+                      setBroadcastForm({
+                        ...broadcastForm,
+                        message: e.target.value,
+                      })
                     }
                     rows={3}
                     className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] resize-none"

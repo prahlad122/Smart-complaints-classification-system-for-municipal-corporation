@@ -8,13 +8,20 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
     setError("");
   };
 
@@ -24,7 +31,9 @@ export default function Login() {
 
     try {
       setLoading(true);
+
       const res = await loginUser(form);
+
       login(res.data);
 
       if (res.data.user.role === "admin") {
@@ -33,31 +42,79 @@ export default function Login() {
         navigate("/");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      setError(
+        err.response?.data?.message || "Invalid credentials. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f1c2e] via-[#1e3a5f] to-[#0f1c2e] px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+    <div
+      className="
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      bg-gradient-to-br
+      from-[#0f1c2e]
+      via-[#1e3a5f]
+      to-[#0f1c2e]
+      px-3
+      sm:px-4
+      lg:px-6
+      py-6
+    "
+    >
+      <div
+        className="
+        w-full
+        max-w-md
+        lg:max-w-lg
+        bg-white
+        rounded-2xl
+        shadow-2xl
+        p-5
+        sm:p-8
+      "
+      >
         {/* Header */}
+
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-[#1e3a5f] rounded-xl mb-4 shadow-lg">
-            <Shield size={28} className="text-amber-400" />
+          <div
+            className="
+            inline-flex
+            items-center
+            justify-center
+            w-12
+            h-12
+            sm:w-14
+            sm:h-14
+            bg-[#1e3a5f]
+            rounded-xl
+            mb-4
+            shadow-lg
+          "
+          >
+            <Shield size={24} className="text-amber-400 sm:w-7 sm:h-7" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-800">Municipal Portal</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Smart Complaints Classification System
+
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800">
+            Municipal Portal
+          </h1>
+
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Smart Complaint Classification System
           </p>
         </div>
 
-        <h2 className="text-xl font-semibold text-center mb-6 text-slate-700">
+        <h2 className="text-lg sm:text-xl font-semibold text-center mb-6 text-slate-700">
           Welcome Back
         </h2>
 
         {/* Error */}
+
         {error && (
           <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
             {error}
@@ -65,48 +122,109 @@ export default function Login() {
         )}
 
         {/* Form */}
+
         <form onSubmit={handleSubmit}>
+          {/* Email */}
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Email Address
             </label>
+
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] focus:border-transparent transition"
               placeholder="Enter your email"
+              className="
+                w-full
+                border
+                border-slate-300
+                rounded-lg
+                px-4
+                py-3
+                text-sm
+                sm:text-base
+                focus:outline-none
+                focus:ring-2
+                focus:ring-[#1e3a5f]
+                focus:border-transparent
+                transition
+              "
             />
           </div>
+
+          {/* Password */}
 
           <div className="mb-5 relative">
             <label className="block text-sm font-medium text-slate-700 mb-1">
               Password
             </label>
+
             <input
               type={showPassword ? "text" : "password"}
               name="password"
               value={form.password}
               onChange={handleChange}
               required
-              className="w-full border border-slate-300 rounded-lg px-3 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f] focus:border-transparent transition"
               placeholder="Enter password"
+              className="
+                w-full
+                border
+                border-slate-300
+                rounded-lg
+                px-4
+                py-3
+                pr-11
+                text-sm
+                sm:text-base
+                focus:outline-none
+                focus:ring-2
+                focus:ring-[#1e3a5f]
+                focus:border-transparent
+                transition
+              "
             />
+
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-9 text-slate-400 hover:text-slate-600 transition"
+              className="
+                absolute
+                right-3
+                top-10
+                text-slate-400
+                hover:text-slate-600
+                transition
+              "
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
+          {/* Submit */}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#1e3a5f] hover:bg-[#2d5a8e] text-white py-2.5 rounded-lg font-medium text-sm transition shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+            className="
+              w-full
+              bg-[#1e3a5f]
+              hover:bg-[#2d5a8e]
+              text-white
+              py-3.5
+              rounded-lg
+              font-medium
+              text-sm
+              sm:text-base
+              transition
+              shadow-md
+              hover:shadow-lg
+              disabled:opacity-60
+              disabled:cursor-not-allowed
+            "
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -119,7 +237,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-sm text-center text-slate-500 mt-6">
+        <p className="text-xs sm:text-sm text-center text-slate-500 mt-6">
           Don't have an account?{" "}
           <Link
             to="/register"

@@ -3,14 +3,7 @@ import {
   getAllComplaints,
   updateComplaint,
 } from "../../services/complaintService";
-import {
-  Search,
-  Filter,
-  X,
-  Download,
-  Brain,
-  CheckCircle2,
-} from "lucide-react";
+import { Search, Filter, X, Download, Brain, CheckCircle2 } from "lucide-react";
 
 const STATUS_OPTIONS = ["All", "Pending", "In Progress", "Resolved"];
 const PRIORITY_OPTIONS = ["All", "Low", "Medium", "High", "Critical"];
@@ -55,10 +48,10 @@ export default function ManageComplaints() {
     try {
       await updateComplaint(id, { status, department });
       setComplaints((prev) =>
-        prev.map((c) => (c._id === id ? { ...c, status, department } : c))
+        prev.map((c) => (c._id === id ? { ...c, status, department } : c)),
       );
       setSelectedComplaint((prev) =>
-        prev ? { ...prev, status, department } : prev
+        prev ? { ...prev, status, department } : prev,
       );
       showToast(" Complaint updated successfully");
     } catch (error) {
@@ -94,8 +87,10 @@ export default function ManageComplaints() {
   // Filtering
   const filtered = complaints.filter((c) => {
     const matchStatus = statusFilter === "All" || c.status === statusFilter;
-    const matchPriority = priorityFilter === "All" || c.priority === priorityFilter;
-    const matchCategory = categoryFilter === "All" || c.category === categoryFilter;
+    const matchPriority =
+      priorityFilter === "All" || c.priority === priorityFilter;
+    const matchCategory =
+      categoryFilter === "All" || c.category === categoryFilter;
     const matchSearch = `${c.title} ${c.location} ${c.user?.name || ""}`
       .toLowerCase()
       .includes(search.toLowerCase());
@@ -104,9 +99,15 @@ export default function ManageComplaints() {
 
   // Stats
   const totalComplaints = complaints.length;
-  const pendingComplaints = complaints.filter((c) => c.status === "Pending").length;
-  const inProgressComplaints = complaints.filter((c) => c.status === "In Progress").length;
-  const resolvedComplaints = complaints.filter((c) => c.status === "Resolved").length;
+  const pendingComplaints = complaints.filter(
+    (c) => c.status === "Pending",
+  ).length;
+  const inProgressComplaints = complaints.filter(
+    (c) => c.status === "In Progress",
+  ).length;
+  const resolvedComplaints = complaints.filter(
+    (c) => c.status === "Resolved",
+  ).length;
 
   // CSV Export
   const handleExport = () => {
@@ -114,7 +115,7 @@ export default function ManageComplaints() {
     const rows = filtered
       .map(
         (c) =>
-          `"${c.title}","${c.category}","${c.priority}","${c.status}","${c.location}","${c.user?.name || ""}","${new Date(c.createdAt).toLocaleDateString()}"`
+          `"${c.title}","${c.category}","${c.priority}","${c.status}","${c.location}","${c.user?.name || ""}","${new Date(c.createdAt).toLocaleDateString()}"`,
       )
       .join("\n");
     const blob = new Blob([headers + rows], { type: "text/csv" });
@@ -164,7 +165,10 @@ export default function ManageComplaints() {
       <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3 shadow-sm">
         <div className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-[200px]">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <input
               type="text"
               placeholder="Search complaints..."
@@ -180,7 +184,9 @@ export default function ManageComplaints() {
             className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
           >
             {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>{s === "All" ? "All Status" : s}</option>
+              <option key={s} value={s}>
+                {s === "All" ? "All Status" : s}
+              </option>
             ))}
           </select>
 
@@ -190,7 +196,9 @@ export default function ManageComplaints() {
             className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
           >
             {PRIORITY_OPTIONS.map((p) => (
-              <option key={p} value={p}>{p === "All" ? "All Priority" : p}</option>
+              <option key={p} value={p}>
+                {p === "All" ? "All Priority" : p}
+              </option>
             ))}
           </select>
 
@@ -200,7 +208,9 @@ export default function ManageComplaints() {
             className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
           >
             {CATEGORY_OPTIONS.map((c) => (
-              <option key={c} value={c}>{c === "All" ? "All Category" : c}</option>
+              <option key={c} value={c}>
+                {c === "All" ? "All Category" : c}
+              </option>
             ))}
           </select>
         </div>
@@ -230,16 +240,22 @@ export default function ManageComplaints() {
                 onClick={() => setSelectedComplaint(complaint)}
                 className="border-b hover:bg-slate-50 cursor-pointer transition"
               >
-                <td className="p-4 font-medium text-slate-700">{complaint.title}</td>
+                <td className="p-4 font-medium text-slate-700">
+                  {complaint.title}
+                </td>
                 <td className="p-4 text-blue-600">{complaint.category}</td>
                 <td className="p-4">
-                  <span className={`px-2 py-1 text-[11px] rounded-full font-medium ${priorityColor(complaint.priority)}`}>
+                  <span
+                    className={`px-2 py-1 text-[11px] rounded-full font-medium ${priorityColor(complaint.priority)}`}
+                  >
                     {complaint.priority}
                   </span>
                 </td>
                 <td className="p-4 text-slate-600">{complaint.location}</td>
                 <td className="p-4">
-                  <span className={`px-2 py-1 text-[11px] rounded-full font-medium ${statusColor(complaint.status)}`}>
+                  <span
+                    className={`px-2 py-1 text-[11px] rounded-full font-medium ${statusColor(complaint.status)}`}
+                  >
                     {complaint.status}
                   </span>
                 </td>
@@ -280,16 +296,24 @@ export default function ManageComplaints() {
               />
             )}
 
-            <h3 className="font-semibold text-lg mb-2">{selectedComplaint.title}</h3>
-            <p className="text-sm text-slate-600 mb-3">{selectedComplaint.description}</p>
-            <p className="text-sm text-slate-500 mb-3">📍 {selectedComplaint.location}</p>
+            <h3 className="font-semibold text-lg mb-2">
+              {selectedComplaint.title}
+            </h3>
+            <p className="text-sm text-slate-600 mb-3">
+              {selectedComplaint.description}
+            </p>
+            <p className="text-sm text-slate-500 mb-3">
+              📍 {selectedComplaint.location}
+            </p>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">
                 {selectedComplaint.category}
               </span>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${priorityColor(selectedComplaint.priority)}`}>
+              <span
+                className={`text-xs px-2 py-1 rounded-full font-medium ${priorityColor(selectedComplaint.priority)}`}
+              >
                 {selectedComplaint.priority}
               </span>
             </div>
@@ -299,7 +323,9 @@ export default function ManageComplaints() {
               <div className="bg-blue-50 rounded-lg p-3 mb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Brain size={14} className="text-blue-600" />
-                  <span className="text-xs font-semibold text-blue-700">AI Classification</span>
+                  <span className="text-xs font-semibold text-blue-700">
+                    AI Classification
+                  </span>
                 </div>
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs text-blue-600">Confidence</span>
@@ -310,11 +336,15 @@ export default function ManageComplaints() {
                 <div className="w-full bg-blue-100 rounded-full h-1.5">
                   <div
                     className="h-1.5 rounded-full bg-blue-500"
-                    style={{ width: `${selectedComplaint.aiConfidence * 100}%` }}
+                    style={{
+                      width: `${selectedComplaint.aiConfidence * 100}%`,
+                    }}
                   ></div>
                 </div>
                 {selectedComplaint.aiSummary && (
-                  <p className="text-xs text-blue-600 mt-2">{selectedComplaint.aiSummary}</p>
+                  <p className="text-xs text-blue-600 mt-2">
+                    {selectedComplaint.aiSummary}
+                  </p>
                 )}
               </div>
             )}
@@ -324,12 +354,18 @@ export default function ManageComplaints() {
             </p>
 
             {/* Department Select */}
-            <label className="text-sm font-medium text-slate-700">Department</label>
+            <label className="text-sm font-medium text-slate-700">
+              Department
+            </label>
             <select
               className="border border-slate-200 rounded-lg p-2 w-full mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
               value={selectedComplaint.department}
               onChange={(e) =>
-                handleUpdate(selectedComplaint._id, selectedComplaint.status, e.target.value)
+                handleUpdate(
+                  selectedComplaint._id,
+                  selectedComplaint.status,
+                  e.target.value,
+                )
               }
             >
               <option>Unassigned</option>
@@ -347,7 +383,11 @@ export default function ManageComplaints() {
               className="border border-slate-200 rounded-lg p-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]"
               value={selectedComplaint.status}
               onChange={(e) =>
-                handleUpdate(selectedComplaint._id, e.target.value, selectedComplaint.department)
+                handleUpdate(
+                  selectedComplaint._id,
+                  e.target.value,
+                  selectedComplaint.department,
+                )
               }
             >
               <option>Pending</option>
@@ -357,7 +397,9 @@ export default function ManageComplaints() {
 
             {/* History */}
             <div className="mt-6">
-              <h3 className="text-sm font-semibold mb-3 text-slate-700">Complaint History</h3>
+              <h3 className="text-sm font-semibold mb-3 text-slate-700">
+                Complaint History
+              </h3>
               <div className="space-y-3">
                 {selectedComplaint.history?.length ? (
                   selectedComplaint.history.map((item, index) => (

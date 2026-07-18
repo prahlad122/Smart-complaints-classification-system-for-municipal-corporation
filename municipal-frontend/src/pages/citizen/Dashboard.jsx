@@ -32,7 +32,9 @@ export default function Dashboard() {
 
   const total = complaints.length;
   const pending = complaints.filter((c) => c.status === "Pending").length;
-  const inProgress = complaints.filter((c) => c.status === "In Progress").length;
+  const inProgress = complaints.filter(
+    (c) => c.status === "In Progress",
+  ).length;
   const resolved = complaints.filter((c) => c.status === "Resolved").length;
 
   const recentComplaints = complaints.slice(0, 3);
@@ -68,7 +70,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between flex-wrap gap-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
-              Welcome back, {user?.name?.split(" ")[0] || "Citizen"} 
+              Welcome back, {user?.name?.split(" ")[0] || "Citizen"}
             </h1>
             <p className="text-blue-100/80 max-w-md">
               Report civic issues, track complaint progress, and stay updated
@@ -98,7 +100,9 @@ export default function Dashboard() {
             </div>
             <span className="text-sm text-slate-500">Total</span>
           </div>
-          <p className="text-2xl font-bold text-slate-800">{loading ? "–" : total}</p>
+          <p className="text-2xl font-bold text-slate-800">
+            {loading ? "–" : total}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
@@ -108,7 +112,9 @@ export default function Dashboard() {
             </div>
             <span className="text-sm text-slate-500">Pending</span>
           </div>
-          <p className="text-2xl font-bold text-amber-600">{loading ? "–" : pending}</p>
+          <p className="text-2xl font-bold text-amber-600">
+            {loading ? "–" : pending}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
@@ -118,7 +124,9 @@ export default function Dashboard() {
             </div>
             <span className="text-sm text-slate-500">In Progress</span>
           </div>
-          <p className="text-2xl font-bold text-blue-600">{loading ? "–" : inProgress}</p>
+          <p className="text-2xl font-bold text-blue-600">
+            {loading ? "–" : inProgress}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
@@ -128,14 +136,18 @@ export default function Dashboard() {
             </div>
             <span className="text-sm text-slate-500">Resolved</span>
           </div>
-          <p className="text-2xl font-bold text-emerald-600">{loading ? "–" : resolved}</p>
+          <p className="text-2xl font-bold text-emerald-600">
+            {loading ? "–" : resolved}
+          </p>
         </div>
       </div>
 
       {/* Recent Complaints */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-800">Recent Complaints</h2>
+          <h2 className="text-xl font-bold text-slate-800">
+            Recent Complaints
+          </h2>
           {complaints.length > 3 && (
             <Link
               to="/my-complaints"
@@ -147,7 +159,9 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="text-sm text-slate-400 py-8 text-center">Loading...</div>
+          <div className="text-sm text-slate-400 py-8 text-center">
+            Loading...
+          </div>
         ) : recentComplaints.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-10 text-center">
             <ClipboardPlus size={40} className="text-slate-300 mx-auto mb-3" />

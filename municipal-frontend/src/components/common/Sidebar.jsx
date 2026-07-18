@@ -3,57 +3,88 @@ import {
   LayoutDashboard,
   PlusCircle,
   FolderOpen,
-  Bell,
   Settings,
   BarChart3,
   Map,
   LogOut,
   Shield,
+  X,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Sidebar() {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  const linkBase =
-    "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200";
-
-  const activeClass =
-    "bg-white/15 text-white border-l-4 border-white pl-3";
-
-  const inactiveClass =
-    "text-blue-100/70 hover:bg-white/10 hover:text-white";
+  const closeSidebar = () => {
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
+    closeSidebar();
     navigate("/login");
   };
 
+  const linkBase =
+    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200";
+
+  const activeClass = "bg-white/15 text-white border-l-4 border-white pl-3";
+
+  const inactiveClass = "text-blue-100/70 hover:bg-white/10 hover:text-white";
+
   return (
-    <aside className="w-64 h-screen bg-[#1e3a5f] flex flex-col justify-between fixed left-0 top-0 z-40">
-      {/* Top — Logo */}
-      <div className="p-5">
-        <div className="mb-8">
+    <aside
+      className={`
+        fixed top-0 left-0 z-50
+        h-screen w-64
+        bg-[#1e3a5f]
+        flex flex-col justify-between
+        transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0
+      `}
+    >
+      {/* Header */}
+      <div className="p-5 overflow-y-auto flex-1">
+        {/* Mobile Close Button */}
+        <div className="flex items-center justify-between lg:hidden mb-6">
+          <div className="flex items-center gap-2">
+            <Shield size={22} className="text-amber-400" />
+            <h1 className="text-lg font-bold text-white">Municipal Portal</h1>
+          </div>
+
+          <button onClick={() => setSidebarOpen(false)} className="text-white">
+            <X size={22} />
+          </button>
+        </div>
+
+        {/* Desktop Logo */}
+        <div className="hidden lg:block mb-8">
           <div className="flex items-center gap-2 mb-1">
             <Shield size={22} className="text-amber-400" />
             <h1 className="text-lg font-bold text-white tracking-tight">
               Municipal Portal
             </h1>
           </div>
+
           <p className="text-xs text-blue-200/50 pl-[30px]">
             Smart Complaints System
           </p>
         </div>
 
-        {/* Citizen Menu */}
+        {/* Menu */}
         <div className="mb-2 text-[10px] text-blue-200/40 uppercase tracking-wider px-4 font-semibold">
           Menu
         </div>
+
         <nav className="space-y-1">
           <NavLink
             to="/"
             end
+            onClick={closeSidebar}
             className={({ isActive }) =>
               `${linkBase} ${isActive ? activeClass : inactiveClass}`
             }
@@ -64,6 +95,7 @@ export default function Sidebar() {
 
           <NavLink
             to="/new-complaint"
+            onClick={closeSidebar}
             className={({ isActive }) =>
               `${linkBase} ${isActive ? activeClass : inactiveClass}`
             }
@@ -74,6 +106,7 @@ export default function Sidebar() {
 
           <NavLink
             to="/my-complaints"
+            onClick={closeSidebar}
             className={({ isActive }) =>
               `${linkBase} ${isActive ? activeClass : inactiveClass}`
             }
@@ -83,7 +116,7 @@ export default function Sidebar() {
           </NavLink>
         </nav>
 
-        {/* Admin Section */}
+        {/* Admin */}
         {isAdmin && (
           <>
             <div className="mt-8 mb-2 text-[10px] text-blue-200/40 uppercase tracking-wider px-4 font-semibold">
@@ -94,6 +127,7 @@ export default function Sidebar() {
               <NavLink
                 to="/admin"
                 end
+                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `${linkBase} ${isActive ? activeClass : inactiveClass}`
                 }
@@ -104,6 +138,7 @@ export default function Sidebar() {
 
               <NavLink
                 to="/admin/manage"
+                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `${linkBase} ${isActive ? activeClass : inactiveClass}`
                 }
@@ -114,6 +149,7 @@ export default function Sidebar() {
 
               <NavLink
                 to="/admin/analytics"
+                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `${linkBase} ${isActive ? activeClass : inactiveClass}`
                 }
@@ -124,6 +160,7 @@ export default function Sidebar() {
 
               <NavLink
                 to="/admin/map"
+                onClick={closeSidebar}
                 className={({ isActive }) =>
                   `${linkBase} ${isActive ? activeClass : inactiveClass}`
                 }
@@ -136,25 +173,27 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Bottom — User Profile + Logout */}
+      {/* User */}
       <div className="p-4 border-t border-white/10">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold shadow-lg">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold">
             {user?.name?.charAt(0)?.toUpperCase() || "U"}
           </div>
+
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">
+            <p className="text-white text-sm font-medium truncate">
               {user?.name || "User"}
             </p>
-            <p className="text-xs text-blue-200/50 truncate">{user?.email}</p>
+
+            <p className="text-xs text-blue-200/60 truncate">{user?.email}</p>
           </div>
         </div>
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 w-full px-4 py-2 rounded-lg text-sm text-blue-100/70 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200"
+          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg text-blue-100 hover:bg-red-500/20 hover:text-red-300 transition"
         >
-          <LogOut size={16} />
+          <LogOut size={17} />
           Logout
         </button>
       </div>

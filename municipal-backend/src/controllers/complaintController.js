@@ -1,6 +1,7 @@
 import Complaint from "../models/Complaint.js";
 import Notification from "../models/Notification.js";
-
+import cloudinary from "../config/cloudinary.js";
+import { Readable } from "stream";
 import { classifyWithAI } from "../utils/aiClassifier.js";
 import {
   departmentMap,
@@ -13,6 +14,23 @@ import {
   notifyDepartmentChange,
   notifyComplaintResolved,
 } from "../utils/notificationHelper.js";
+
+// Upload image buffer to Cloudinary
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "municipal-complaints",
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      },
+    );
+
+    Readable.from(buffer).pipe(uploadStream);
+  });
+};
 
 /* ---------------- CREATE COMPLAINT ---------------- */
 
@@ -42,30 +60,38 @@ export const createComplaint = async (req, res) => {
     const aiResult = await classifyWithAI(title, description);
 
     if (aiResult) {
-      // AI classification succeeded
       classificationMethod = "AI";
       category = aiResult.category;
       priority = aiResult.priority;
       aiConfidence = aiResult.confidence;
       aiSummary = aiResult.summary;
-      console.log("AI classification used:", category, priority);
     } else {
-      // Fallback to keyword rules
       classificationMethod = "Fallback";
+
       const fallback = getFallbackResult(title, description);
+
       category = fallback.category;
       priority = fallback.priority;
       aiConfidence = fallback.confidence;
       aiSummary = fallback.summary;
-      console.log("Fallback classifier used:", category, priority);
     }
 
     department = departmentMap[category] || "General Department";
 
+    /* ---------- UPLOAD IMAGE TO CLOUDINARY ---------- */
+
+    let imageUrl = null;
+
+    if (req.file) {
+      const result = await uploadToCloudinary(req.file.buffer);
+
+      imageUrl = result.secure_url;
+    }
     /* ---------- CREATE COMPLAINT ---------- */
 
     const complaint = await Complaint.create({
       user: req.user.id,
+
       title: title.trim(),
       description: description.trim(),
       location: location.trim(),
@@ -76,10 +102,12 @@ export const createComplaint = async (req, res) => {
       category,
       department,
       priority,
+
       aiConfidence,
       aiSummary,
 
-      image: req.file ? req.file.path : null,
+      image: imageUrl,
+
       status: "Pending",
 
       history: [
@@ -89,8 +117,7 @@ export const createComplaint = async (req, res) => {
       ],
     });
 
-    //  Notify citizen that complaint was received
-    notifyComplaintReceived(req.user.id, complaint);
+    await notifyComplaintReceived(req.user.id, complaint);
 
     res.status(201).json({
       message: "Complaint submitted successfully",
@@ -101,6 +128,7 @@ export const createComplaint = async (req, res) => {
 
     res.status(500).json({
       message: "Failed to submit complaint",
+      error: error.message,
     });
   }
 };
