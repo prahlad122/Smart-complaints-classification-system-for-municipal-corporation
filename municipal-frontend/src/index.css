@@ -41,3 +41,22 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* Keep Leaflet below overlays */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom,
+.leaflet-control {
+  z-index: 2 !important;
+}
+
+/* Sidebar and navbar must stay above Leaflet */
+aside {
+  z-index: 1000 !important;
+}
