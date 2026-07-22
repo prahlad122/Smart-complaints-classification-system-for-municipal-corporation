@@ -60,4 +60,4 @@ body {
 /* Sidebar and navbar must stay above Leaflet */
 aside {
   z-index: 1000 !important;
-}
+} 
